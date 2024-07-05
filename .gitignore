@@ -1,0 +1,4 @@
+.vscode/
+kernel/kernel.bin
+kernel/out/
+user/out/

@@ -26,3 +26,8 @@ clean:
 	$(MAKE) clean -C kernel/
 	$(MAKE) clean -C user/
 
+run:
+	$(MAKE) all && qemu-system-i386 -machine q35 -m 256 -kernel kernel/kernel.bin
+
+debug:
+	$(MAKE) all && qemu-system-i386 -machine q35 -m 256 -kernel kernel/kernel.bin -s -S

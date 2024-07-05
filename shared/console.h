@@ -7,4 +7,6 @@
  */
 extern void console_putbytes(const char *s, int len);
 
+extern void efface_ecran();
+
 #endif

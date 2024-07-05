@@ -1,24 +1,17 @@
 #include "debugger.h"
 #include "cpu.h"
-
-int fact(int n)
-{
-	if (n < 2)
-		return 1;
-
-	return n * fact(n-1);
-}
+#include "./../shared/debug.h"
+#include "./../shared/console.h"
 
 
 void kernel_start(void)
 {
-	int i;
-//	call_debugger();
+	efface_ecran();
+	printf("\bHello world!");
+	printf("\tpénissedelout\bre\t\t\t\t\t\t\t\t\t\t\t\tb\br");
 
-	i = 10;
-
-	i = fact(i);
-
+	printf("\f");
+	
 	while(1)
 	  hlt();
 
