@@ -2,9 +2,11 @@
 #include "./../shared/string.h"
 #include "./../shared/debug.h"
 #include "cpu.h"
+#include "./../shared/malloc.c"
 
 struct processus* proc_elu; 
-struct processus table_processus[TAILLE_TABLE_PROCESSUS];
+struct processus* table_processus[TAILLE_TABLE_PROCESSUS];
+struct processus* queue_table;
 
 struct processus processus0;
 struct processus processus1;
@@ -16,6 +18,35 @@ char *mon_nom() {
 int mon_pid() {
     return proc_elu->pid;
 }
+
+int32_t cree_processus(void (*code)(void), char *nom) {
+    if (!queue_table) {
+        table_processus[0] = malloc(sizeof(struct processus));
+        queue_table = table_processus[0];
+        queue_table->pid = 0;
+        strcpy(queue_table->nom, nom);
+        queue_table->etat = ELU;
+        proc_elu = queue_table;
+    } else {
+        int new_pid = queue_table->pid + 1;
+
+        if (new_pid >= TAILLE_TABLE_PROCESSUS) {
+            return -1;
+        }
+
+        table_processus[new_pid] = malloc(sizeof(struct processus));
+        queue_table->next = table_processus[new_pid];
+        queue_table = table_processus[new_pid];
+        queue_table->pid = new_pid;
+        strcpy(queue_table->nom, nom);
+        queue_table->etat = ACTIVABLE;
+
+        queue_table->pile[TAILLE_PILE_EXEC - 1] = (int) code;
+        queue_table->contexte[1] = (int) &(queue_table->pile[TAILLE_PILE_EXEC - 1]);
+    }
+    return queue_table->pid;
+}
+
 
 void idle(void)
 {
@@ -32,38 +63,34 @@ void proc1(void) {
     }
 }
 
+void proc2(void) {
+    for (;;) {
+        printf("[%s] pid = %i\n", mon_nom(), mon_pid());
+        ordonnance();
+    }
+}
+
 
 void init_processus(){
-    processus0.pid = 0;
-    strcpy(processus0.nom, "idle");
-    processus0.etat = ELU;
+    queue_table = NULL;
+    cree_processus(idle, "idle");
+    cree_processus(proc1, "proc1");
+    cree_processus(proc2, "proc2");
 
-    processus1.pid = 1;
-    strcpy(processus1.nom, "proc1");
-    processus1.etat = ACTIVABLE;
+    printf("TABLE : \n");
 
-    table_processus[0] = processus0;
-    table_processus[1] = processus1;
-    proc_elu = &(table_processus[0]);
-
-    // Initialisation de proc1 qui n'a encore jamais été exécuté 
-    //int* addr_sommet_pile = &(processus1.pile[TAILLE_PILE_EXEC - 1]);
-    //processus1.pile[TAILLE_PILE_EXEC - 1] = (int) proc1; 
-    //processus1.contexte[1] = (int) addr_sommet_pile;
-
-    int* addr_sommet_pile = &(table_processus[1].pile[TAILLE_PILE_EXEC - 1]);
-    table_processus[1].pile[TAILLE_PILE_EXEC - 1] = (int) proc1; 
-    table_processus[1].contexte[1] = (int) addr_sommet_pile;
+    for (int i = 0; i < 3; i++) {
+        printf("name : %s\npid : %i\n", table_processus[i]->nom, table_processus[i]->pid);
+    }
 }
 
 void ordonnance(void) {
-    int curr_pid = proc_elu->pid;
     struct processus *next_proc;
 
-    if (curr_pid + 1 < TAILLE_TABLE_PROCESSUS) {
-        next_proc = proc_elu + 1;
+    if (proc_elu->next) {
+        next_proc = proc_elu->next;
     } else {
-        next_proc = &(table_processus[0]);
+        next_proc = table_processus[0];
     }
 
     proc_elu->etat = ACTIVABLE;

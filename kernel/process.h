@@ -1,8 +1,10 @@
 #ifndef __PROCESS_H__
 #define __PROCESS_H__
 
-#define TAILLE_TABLE_PROCESSUS 2
+#define TAILLE_TABLE_PROCESSUS 5
 #define TAILLE_PILE_EXEC 256
+
+#include "./../shared/stdint.h"
 
 enum Etat {
     ELU,
@@ -16,6 +18,7 @@ struct processus {
     enum Etat etat;
     int contexte[5];
     int pile[TAILLE_PILE_EXEC];
+    struct processus* next;
 };
 
 extern struct processus* proc_elu;
