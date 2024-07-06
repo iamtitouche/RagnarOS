@@ -2,18 +2,22 @@
 #include "cpu.h"
 #include "./../shared/debug.h"
 #include "./../shared/console.h"
+#include "horloge.h"
 
 
 void kernel_start(void)
 {
+	// initialisations
 	efface_ecran();
-	printf("\bHello world!");
-	printf("\tpénissedelout\bre\t\t\t\t\t\t\t\t\t\t\t\tb\br");
+	init_frequency();
+	init_traitant_IT(32, traitant_IT_32);
+	masque_IRQ(0, 0);
 
-	printf("\f");
+	// démasquage des interruptions externes
+	sti();
 	
-	while(1)
-	  hlt();
+	// boucle d’attente
+	while (1) hlt();
 
 	return;
 }

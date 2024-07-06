@@ -1,5 +1,4 @@
 #include "./../shared/console.h"
-#include "./../shared/stdint.h"
 #include "cpu.h"
 #include "string.h"
 #define VIDEO_MEMORY_BASE 0xB8000
@@ -8,7 +7,7 @@ uint8_t lig_cur = 0;
 uint8_t col_cur = 0;
 
 uint16_t *ptr_mem(uint32_t lig, uint32_t col){
-    return (uint16_t*) ( VIDEO_MEMORY_BASE + 2 * ( lig * 80 + col));
+    return (uint16_t*) (VIDEO_MEMORY_BASE + 2 * ( lig * 80 + col));
 }
 
 void ecrit_car(uint32_t lig, uint32_t col, char c){
