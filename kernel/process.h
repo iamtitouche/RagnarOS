@@ -5,6 +5,7 @@
 #define TAILLE_PILE_EXEC 256
 
 #include "./../shared/stdint.h"
+#include "./../shared/queue.h"
 
 enum Etat {
     ELU,
@@ -19,6 +20,8 @@ struct processus {
     int contexte[5];
     int pile[TAILLE_PILE_EXEC];
     struct processus* next;
+    link lien;
+    int prio;
 };
 
 extern struct processus* proc_elu;
