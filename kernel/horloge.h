@@ -2,14 +2,11 @@
 #define ___HORLOGE_H___
 #include "./../shared/stdint.h"
 #include "./../shared/stdbool.h"
+#include "cst_sys.h"
 
-#define ADDR_TABLE_INTERRUPTIONS 0x1000
-#define QUARTZ 0x1234DD
-#define CLOCKFREQ 50
 
-extern int nb_sec;
-extern int nb_min;
-extern int nb_heure;
+// extern int nb_min;
+// extern int nb_heure;
 
 void ecrit_temps(char* c, int length);
 

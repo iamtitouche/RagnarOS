@@ -1,11 +1,9 @@
 #ifndef __PROCESS_H__
 #define __PROCESS_H__
 
-#define TAILLE_TABLE_PROCESSUS 5
-#define TAILLE_PILE_EXEC 256
-
 #include "./../shared/stdint.h"
 #include "./../shared/queue.h"
+#include "cst_sys.h"
 
 enum Etat {
     ELU,
@@ -22,15 +20,19 @@ struct processus {
     struct processus* next;
     link lien;
     int prio;
+    int sec_reveil;
 };
 
 extern struct processus* proc_elu;
 
 void init_processus(void);
+
 void idle(void);
 
 void ctx_sw(int* contexte_ancien, int* contexte_nouveau);
 
 void ordonnance(void);
+
+void dors(uint32_t nbr_secs);
 
 #endif
