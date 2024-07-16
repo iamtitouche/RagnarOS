@@ -9,6 +9,7 @@ struct processus* proc_elu;
 struct processus* table_processus[TAILLE_TABLE_PROCESSUS];
 link tete_activable = LIST_HEAD_INIT(tete_activable);
 link tete_endormis = LIST_HEAD_INIT(tete_endormis);
+link tete_zombies = LIST_HEAD_INIT(tete_zombies);
 
 char *mon_nom() {
     return proc_elu->nom;
@@ -111,7 +112,6 @@ void init_processus(){
 void reveil_processus() {
     struct processus* ptr_proc;
     int nb_proc_a_reveiller = 0;
-    //printf("penis\n");
 
     if(queue_empty(&tete_endormis) || ((struct processus*) (queue_bottom(&tete_endormis, struct processus, lien)))->sec_reveil > nb_sec) return;
     
@@ -135,6 +135,7 @@ void reveil_processus() {
 }
 
 void ordonnance(void) {
+    liberer_zombies();
     reveil_processus();
     if (!queue_empty(&tete_activable)) {
         if (proc_elu->etat == ENDORMI) {
@@ -157,7 +158,7 @@ void ordonnance(void) {
         proc_elu = tete;
 
         ctx_sw(&(ancien_elu->contexte[0]), &(proc_elu->contexte[0]));
-    } 
+    }
 }
 
 void dors(uint32_t nbr_secs) {
@@ -171,8 +172,19 @@ void dors(uint32_t nbr_secs) {
     ordonnance();
 }
 
-// 0 1 2 3 0 1 2 1 3 1 2 1 2 1 3 1 2
+void fin_processus(void){
+    if (proc_elu->pid == 0){
+        panic("idle ne peut pas se terminer");
+    }
+    proc_elu->etat = ZOMBIE;
+    int pid = proc_elu->pid;
+    table_processus[pid] = NULL;
+    printf("penis de loutre");
+}
 
-// 1: 2 4 6 8 10 12
-// 2: 3 6 9 12
-// 3: 5 10 
+void liberer_zombies(void){
+    queue_for_each(ptr_proc, &tete_endormis, struct processus, lien){
+        int pid = ptr_proc->pid;
+        free(ptr_proc);
+    }
+}

@@ -8,7 +8,8 @@
 enum Etat {
     ELU,
     ACTIVABLE,
-    ENDORMI
+    ENDORMI,
+    ZOMBIE
 };
 
 struct processus {
